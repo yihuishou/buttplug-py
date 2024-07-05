@@ -49,6 +49,32 @@ make usage of the library clearer.
 
 Buttplug-py is BSD 3-Clause licensed. More information is available in the [LICENSE file](LICENSE).
 
+## 记录一个远古版本的 Bug
+需要确认这个版本是否已经修复了
+
+#### send_vibrate_cmd(float) only works with single-motor devices
+```
+Devices with multiple motors will not vibrate as expected when using send_vibrate_cmd(float). Instead, only the first motor of that device will vibrate.
+
+Steps to reproduce:
+
+Connect a device with multiple motors (e.g. Lovense Edge)
+Perform send_vibrate_cmd(1.0) on that device.
+The first motor will vibrate while the second does not.
+Expected behavior:
+
+All motors will vibrate with the same intensity.
+
+It appears to be because Line 255 of buttplug/client/client.py only sets the speed of the motor at index 0 and does not consider devices with multiple motors.
+
+Workaround: Multiplying a list by the number of motors:
+e.g.
+
+vibratorCount = dev.allowed_messages["VibrateCmd"].feature_count
+intensity = [1.0] * vibratorCount
+await dev.send_vibrate_cmd(intensity)
+```
+
 ## Changelog
 
 The full changelog can be found [here](CHANGELOG.md).
